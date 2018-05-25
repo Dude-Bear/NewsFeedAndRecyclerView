@@ -1,6 +1,9 @@
 package com.example.android.newsfeedandrecyclerview;
 
 import android.content.Intent;
+import android.app.LoaderManager;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Loader;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -23,10 +26,10 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity{
+//public class MainActivity extends AppCompatActivity{
 
-//public class MainActivity extends AppCompatActivity
-//        implements LoaderManager.LoaderCallbacks<List<News>> {
+public class MainActivity extends AppCompatActivity
+        implements LoaderCallbacks<List<News>> {
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -99,6 +102,39 @@ public class MainActivity extends AppCompatActivity{
 
 
     }
+
+
+    @Override
+    public Loader<List<News>> onCreateLoader(int i, Bundle bundle) {
+        // Create a new loader for the given URL
+        return new NewsLoader(this, GUARDIAN_REQUEST_URL);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<News>> loader, List<News> news) {
+        // Hide loading indicator because the data has been loaded
+        View loadingIndicator = findViewById(R.id.loading_indicator);
+        loadingIndicator.setVisibility(View.GONE);
+
+        // Set empty state text to display "No news found."
+        mEmptyStateTextView.setText(R.string.no_news);
+
+        // Clear the adapter of previous news data
+        adapter.clear();
+
+        // If there is a valid list of {@link News}s, then add them to the adapter's
+        // data set. This will trigger the ListView to update.
+        if (news != null && !news.isEmpty()) {
+            adapter.addAll(news);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<News>> loader) {
+        // Loader reset, so we can clear out our existing data.
+        adapter.clear();
+    }
+
 
     /**
      * Initializing collapsing toolbar
@@ -218,36 +254,6 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-//    @Override
-//    public Loader<List<News>> onCreateLoader(int i, Bundle bundle) {
-//        // Create a new loader for the given URL
-//        return new NewsLoader(this, GUARDIAN_REQUEST_URL);
-//    }
-//
-//    @Override
-//    public void onLoadFinished(Loader<List<News>> loader, List<News> news) {
-//        // Hide loading indicator because the data has been loaded
-//        View loadingIndicator = findViewById(R.id.loading_indicator);
-//        loadingIndicator.setVisibility(View.GONE);
-//
-//        // Set empty state text to display "No news found."
-//        mEmptyStateTextView.setText(R.string.no_news);
-//
-//        // Clear the adapter of previous news data
-//        adapter.clear();
-//
-//        // If there is a valid list of {@link News}s, then add them to the adapter's
-//        // data set. This will trigger the ListView to update.
-//        if (news != null && !news.isEmpty()) {
-//            adapter.addAll(news);
-//        }
-//    }
-//
-//    @Override
-//    public void onLoaderReset(Loader<List<News>> loader) {
-//        // Loader reset, so we can clear out our existing data.
-//        adapter.clear();
-//    }
 
     /**
      * Converting dp to pixel
